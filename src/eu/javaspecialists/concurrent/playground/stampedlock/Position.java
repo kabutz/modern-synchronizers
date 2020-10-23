@@ -1,6 +1,10 @@
 package eu.javaspecialists.concurrent.playground.stampedlock;
 
+import java.util.concurrent.locks.*;
+
 public class Position {
+  public static final int RETRY_COUNT = 5;
+  private final StampedLock sl = new StampedLock();
   private double x, y;
 
   public Position(double x, double y) {
@@ -8,13 +12,37 @@ public class Position {
     this.y = y;
   }
 
-  public synchronized void moveBy(double deltaX, double deltaY) {
-    x += deltaX;
-    y += deltaY;
+  public void moveBy(double deltaX, double deltaY) {
+    long stamp = sl.writeLock();
+    try {
+      x += deltaX;
+      y += deltaY;
+    } finally {
+      sl.unlockWrite(stamp);
+    }
   }
 
-  public synchronized double distanceFromOrigin() {
-    return Math.hypot(x, y);
+  public double distanceFromOrigin() {
+    double currentX, currentY;
+    out:
+    {
+      for (int i = 0; i < RETRY_COUNT; i++) {
+        long stamp = sl.tryOptimisticRead();
+        currentX = x;
+        currentY = y;
+        if (sl.validate(stamp)) {
+          break out;
+        }
+      }
+      long stamp = sl.readLock();
+      try {
+        currentX = x;
+        currentY = y;
+      } finally {
+        sl.unlockRead(stamp);
+      }
+    }
+    return Math.hypot(currentX, currentY);
   }
 }
 
