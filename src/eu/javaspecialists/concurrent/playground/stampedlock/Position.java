@@ -1,6 +1,9 @@
 package eu.javaspecialists.concurrent.playground.stampedlock;
 
+import java.util.concurrent.locks.*;
+
 public class Position {
+  private final StampedLock sl = new StampedLock();
   private double x, y;
 
   public Position(double x, double y) {
@@ -8,13 +11,29 @@ public class Position {
     this.y = y;
   }
 
-  public synchronized void moveBy(double deltaX, double deltaY) {
-    x += deltaX;
-    y += deltaY;
+  public void moveBy(double deltaX, double deltaY) {
+    long stamp = sl.writeLock();
+    try {
+      x += deltaX;
+      y += deltaY;
+    } finally {
+      sl.unlockWrite(stamp);
+    }
   }
 
-  public synchronized double distanceFromOrigin() {
-    return Math.hypot(x, y);
+  public double distanceFromOrigin() {
+    long stamp = sl.tryOptimisticRead();
+    double localX = x, localY = y;
+    if (!sl.validate(stamp)) {
+      stamp = sl.readLock();
+      try {
+        localX = x;
+        localY = y;
+      } finally {
+        sl.unlockRead(stamp);
+      }
+    }
+    return Math.hypot(localX, localY);
   }
 }
 
