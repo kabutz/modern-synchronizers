@@ -32,6 +32,8 @@ public class PositionTest {
     System.out.println("Worst values:");
     System.out.printf(Locale.US, "\tmoveBy()        %,d%n", worstMoveThread.longValue());
     System.out.printf(Locale.US, "\tdistanceFromOrigin()         %,d%n", worstDistanceThread.longValue());
+    System.out.printf("%,d%n", Position.numberOfDistanceCalls);
+    System.out.printf("%,d%n", Position.numberOfOptimisticFailures);
   }
 
   private void test() throws InterruptedException {

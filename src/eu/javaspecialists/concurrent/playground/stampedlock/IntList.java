@@ -1,46 +1,67 @@
 package eu.javaspecialists.concurrent.playground.stampedlock;
 
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 public class IntList {
-  private final Object monitor = new Object();
+  private final StampedLock sl = new StampedLock();
   private int[] arr = new int[10];
   private int size = 0;
 
   public int size() {
-    synchronized (monitor) {
-      return size;
-    }
+    sl.tryOptimisticRead();
+    return size;
   }
 
   public int get(int index) {
-    synchronized (monitor) {
+    for (int i = 0; i < 5; i++) {
+      var stamp = sl.tryOptimisticRead();
+      int[] currentArr = arr;
+      int currentSize = size;
+      if (index < currentArr.length) {
+        int value = currentArr[index];
+        if (sl.validate(stamp)) {
+          rangeCheck(index, currentSize);
+          return value;
+        }
+      }
+    }
+    var stamp = sl.readLock();
+    try {
       rangeCheck(index, size);
       return arr[index];
+    } finally {
+      sl.unlockRead(stamp);
     }
   }
 
   public boolean add(int e) {
-    synchronized (monitor) {
+    var stamp = sl.writeLock();
+    try {
       if (size + 1 > arr.length)
         arr = Arrays.copyOf(arr, size + 10);
 
       arr[size++] = e;
       return true;
+    } finally {
+      sl.unlockWrite(stamp);
     }
   }
 
   public void trimToSize() {
-    synchronized (monitor) {
+    var stamp = sl.writeLock();
+    try {
       if (size < arr.length)
         arr = Arrays.copyOf(arr, size);
+    } finally {
+      sl.unlockWrite(stamp);
     }
   }
 
   public int remove(int index) {
-    synchronized (monitor) {
+    var stamp = sl.writeLock();
+    try {
       rangeCheck(index, size);
-
       int oldValue = arr[index];
 
       int numMoved = size - index - 1;
@@ -50,6 +71,8 @@ public class IntList {
       arr[--size] = 0;
 
       return oldValue;
+    } finally {
+      sl.unlockWrite(stamp);
     }
   }
 
