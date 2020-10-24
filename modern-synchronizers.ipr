@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="CopyrightManager" default="phaser talk">
+    <copyright>
+      <option name="keyword" value="©" />
+      <option name="notice" value="This class forms part of the Thread Safety with Phaser, &#10;StampedLock and VarHandle Talk by Dr Heinz Kabutz from&#10;JavaSpecialists.eu and may not be distributed without written &#10;consent.&#10;&#10;© 2020 Heinz Max Kabutz, All rights reserved." />
+      <option name="myName" value="phaser talk" />
+    </copyright>
+  </component>
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
       <option name="myName" value="Project Default" />
