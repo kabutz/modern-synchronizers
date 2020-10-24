@@ -9,7 +9,27 @@
 
 package eu.javaspecialists.concurrent.playground.stampedlock;
 
+import java.util.concurrent.locks.*;
+
+/*
+With synchronized Position:
+Best values:
+	moveBy()        29,378,651
+	distanceFromOrigin()         37,476,220
+Worst values:
+	moveBy()        10,891,372
+	distanceFromOrigin()         29,554,318
+
+With pessimistic read lock on StampedLock:
+Best values:
+	moveBy()        21,352,588
+	distanceFromOrigin()         17,865,360
+Worst values:
+	moveBy()        18,183,125
+	distanceFromOrigin()         12,796,374
+ */
 public class Position {
+  private final StampedLock sl = new StampedLock();
   private double x, y;
 
   public Position(double x, double y) {
@@ -17,13 +37,25 @@ public class Position {
     this.y = y;
   }
 
-  public synchronized void moveBy(double deltaX, double deltaY) {
-    x += deltaX;
-    y += deltaY;
+  public void moveBy(double deltaX, double deltaY) {
+    // pessimistic exclusive lock
+    long stamp = sl.writeLock();
+    try {
+      x += deltaX;
+      y += deltaY;
+    } finally {
+      sl.unlockWrite(stamp);
+    }
   }
 
-  public synchronized double distanceFromOrigin() {
-    return Math.hypot(x, y);
+  public double distanceFromOrigin() {
+    // pessimistic non-exclusive lock
+    long stamp = sl.readLock();
+    try {
+      return Math.hypot(x, y);
+    } finally {
+      sl.unlockRead(stamp);
+    }
   }
 }
 
