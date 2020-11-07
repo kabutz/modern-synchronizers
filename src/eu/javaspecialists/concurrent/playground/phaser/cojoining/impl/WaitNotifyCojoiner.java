@@ -12,11 +12,27 @@ package eu.javaspecialists.concurrent.playground.phaser.cojoining.impl;
 import eu.javaspecialists.concurrent.playground.phaser.cojoining.*;
 
 public class WaitNotifyCojoiner implements Cojoiner {
-    public void runWaiter() {
-        throw new UnsupportedOperationException("TODO");
-    }
+  private final Object monitor = new Object();
+  private boolean ready = false;
 
-    public void runSignaller() {
-        throw new UnsupportedOperationException("TODO");
+  public void runWaiter() {
+    synchronized (monitor) {
+      boolean interrupted = Thread.interrupted();
+      while (!ready) {
+        try {
+          monitor.wait();
+        } catch (InterruptedException e) {
+          interrupted = true;
+        }
+      }
+      if (interrupted) Thread.currentThread().interrupt(); // self-interrupt
     }
+  }
+
+  public void runSignaller() {
+    synchronized (monitor) {
+      ready = true;
+      monitor.notifyAll();
+    }
+  }
 }
