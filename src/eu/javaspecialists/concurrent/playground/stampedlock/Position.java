@@ -28,6 +28,13 @@ Worst values:
 	moveBy()        16,729,742
 	distanceFromOrigin()         27,008,132
 
+Best values:
+	moveBy()        23,669,057
+	distanceFromOrigin()         49,678,226
+Worst values:
+	moveBy()        16,653,525
+	distanceFromOrigin()         34,845,552
+
  */
 public class Position {
   private final StampedLock sl = new StampedLock();
@@ -49,6 +56,22 @@ public class Position {
   }
 
   public double distanceFromOrigin() {
+    long stamp = sl.tryOptimisticRead();
+    try {
+      retryHoldingLock: for(;; stamp = sl.readLock()) {
+//        if (stamp == 0) continue retryHoldingLock; // I don't do this
+        double currentX = x, currentY = y;
+        if (!sl.validate(stamp)) continue retryHoldingLock;
+        return Math.hypot(currentX, currentY);
+      }
+    } finally {
+      if (StampedLock.isReadLockStamp(stamp)) {
+        sl.unlockRead(stamp);
+      }
+    }
+  }
+
+  public double distanceFromOriginJava8() {
     long stamp = sl.tryOptimisticRead();
     double currentX = x, currentY = y;
     if (!sl.validate(stamp)) {
