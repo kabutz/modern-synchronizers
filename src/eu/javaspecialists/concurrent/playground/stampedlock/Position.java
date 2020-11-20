@@ -23,7 +23,7 @@ public class Position {
   }
 
   public synchronized double distanceFromOrigin() {
-    return Math.hypot(x, y);
+    return Math.sqrt(x * x + y * y);
   }
 }
 
