@@ -4,7 +4,7 @@
  * JavaSpecialists.eu and may not be distributed without written
  * consent.
  *
- * © 2020 Heinz Max Kabutz, All rights reserved.
+ * (C)opyright 2020 Heinz Max Kabutz, All rights reserved.
  */
 
 package eu.javaspecialists.concurrent.playground.phaser.cojoining;
