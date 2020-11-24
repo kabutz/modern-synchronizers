@@ -18,6 +18,13 @@ public class PositionTest {
   private static final ThreadMXBean tmbean = ManagementFactory.getThreadMXBean();
 
   public static final int REPEATS = 10;
+  private static final int WRITERS = Math.max(Runtime.getRuntime().availableProcessors() / 6, 1);
+  private static final int READERS = Math.max((Runtime.getRuntime().availableProcessors() - WRITERS * 2)/ 2, 1);
+  static {
+    System.out.println("REPEATS = " + REPEATS);
+    System.out.println("WRITERS = " + WRITERS);
+    System.out.println("READERS = " + READERS);
+  }
 
   private int distanceTest = 0;
 
@@ -46,6 +53,13 @@ public class PositionTest {
   private void test() throws InterruptedException {
     Position position = new Position(0, 0);
     AtomicBoolean testing = new AtomicBoolean(true);
+
+//    ExecutorService threads = Executors.newCachedThreadPool();
+//    for (int i = 0; i < WRITERS; i++) {
+//
+//    }
+
+
     Thread[] threads = {
         new Thread(() -> {
           double[] moves = ThreadLocalRandom.current().doubles(1024, -100, +100).toArray();
