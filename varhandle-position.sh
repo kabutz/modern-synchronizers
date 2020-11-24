@@ -7,7 +7,8 @@
 # (C)opyright 2020 Heinz Max Kabutz, All rights reserved.
 #
 
-pushd src
+git pull
+cd src
 javac -d ../out/production/modern-synchronizers eu/javaspecialists/concurrent/playground/varhandles/Position*.java
-popd
+cd ..
 java -cp out/production/modern-synchronizers eu/javaspecialists/concurrent/playground/varhandles/PositionTest

@@ -7,7 +7,8 @@
 # (C)opyright 2020 Heinz Max Kabutz, All rights reserved.
 #
 
-pushd src
-javac -d ../out/production/modern-synchronizers eu/javaspecialists/concurrent/playground/phaser/cojoining/*.java eu/javaspecialists/concurrent/playground/phaser/cojoining/impl/*.java 
-popd
+git pull
+cd src
+javac -d ../out/production/modern-synchronizers eu/javaspecialists/concurrent/playground/phaser/cojoining/*.java eu/javaspecialists/concurrent/playground/phaser/cojoining/impl/*.java
+cd ..
 java -cp out/production/modern-synchronizers eu/javaspecialists/concurrent/playground/phaser/cojoining/TestAll
