@@ -9,6 +9,8 @@
 
 package eu.javaspecialists.concurrent.playground.stampedlock;
 
+
+// TODO: Refactor to use ReentrantLock, then ReentrantReadWriteLock, then StampedLock
 public class Position {
     private double x, y;
 
