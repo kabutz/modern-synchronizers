@@ -26,12 +26,10 @@ public class PositionTest {
     System.out.println("READERS = " + READERS);
   }
 
-  private int distanceTest = 0;
-
-  private static LongAccumulator bestMoveThread = new LongAccumulator(Long::max, 0);
-  private static LongAccumulator bestDistanceThread = new LongAccumulator(Long::max, 0);
-  private static LongAccumulator worstMoveThread = new LongAccumulator(Long::min, Long.MAX_VALUE);
-  private static LongAccumulator worstDistanceThread = new LongAccumulator(Long::min, Long.MAX_VALUE);
+  private static final LongAccumulator bestMoveThread = new LongAccumulator(Long::max, 0);
+  private static final LongAccumulator bestDistanceThread = new LongAccumulator(Long::max, 0);
+  private static final LongAccumulator worstMoveThread = new LongAccumulator(Long::min, Long.MAX_VALUE);
+  private static final LongAccumulator worstDistanceThread = new LongAccumulator(Long::min, Long.MAX_VALUE);
 
   public static void main(String... args) throws InterruptedException {
     System.out.println("c/e = cpu time / elapsed time");
@@ -54,78 +52,59 @@ public class PositionTest {
     Position position = new Position(0, 0);
     AtomicBoolean testing = new AtomicBoolean(true);
 
-//    ExecutorService threads = Executors.newCachedThreadPool();
-//    for (int i = 0; i < WRITERS; i++) {
-//
-//    }
+    ExecutorService threads = Executors.newCachedThreadPool();
 
+    for (int writer = 1; writer <= WRITERS; writer++) {
+      int finalWriter = writer;
+      threads.submit(() -> {
+        double[] moves = ThreadLocalRandom.current().doubles(1024, -100, +100).toArray();
+        long time = System.currentTimeMillis();
+        long userTime = tmbean.getCurrentThreadUserTime();
+        long cpuTime = tmbean.getCurrentThreadCpuTime();
+        long count = 0;
+        int pos = 0;
+        while (testing.get()) {
+          position.moveBy(moves[pos++ & 1023], moves[pos++ & 1023]);
+          count++;
+        }
+        bestMoveThread.accumulate(count);
+        worstMoveThread.accumulate(count);
+        time = System.currentTimeMillis() - time;
+        userTime = tmbean.getCurrentThreadUserTime() - userTime;
+        cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
+        System.out.printf(Locale.US, "move" + finalWriter + "() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
+                count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
+      });
+    }
 
-    Thread[] threads = {
-        new Thread(() -> {
-          double[] moves = ThreadLocalRandom.current().doubles(1024, -100, +100).toArray();
-          long time = System.currentTimeMillis();
-          long userTime = tmbean.getCurrentThreadUserTime();
-          long cpuTime = tmbean.getCurrentThreadCpuTime();
-          long count = 0;
-          int pos = 0;
-          while (testing.get()) {
-            position.moveBy(moves[pos++ & 1023], moves[pos++ & 1023]);
-            count++;
-          }
-          bestMoveThread.accumulate(count);
-          worstMoveThread.accumulate(count);
-          time = System.currentTimeMillis() - time;
-          userTime = tmbean.getCurrentThreadUserTime() - userTime;
-          cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
-          System.out.printf(Locale.US, "move() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
-              count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
-        }, "moveThread"),
-        new Thread(() -> {
-          long time = System.currentTimeMillis();
-          long userTime = tmbean.getCurrentThreadUserTime();
-          long cpuTime = tmbean.getCurrentThreadCpuTime();
-          long count = 0;
-          double totalDistance = 0;
-          while (testing.get()) {
-            totalDistance += position.distanceFromOrigin();
-            count++;
-          }
-          bestDistanceThread.accumulate(count);
-          worstDistanceThread.accumulate(count);
-          time = System.currentTimeMillis() - time;
-          userTime = tmbean.getCurrentThreadUserTime() - userTime;
-          cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
-          System.out.printf(Locale.US, "distanceFromOrigin1() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
-              count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
-        }, "distanceFromOriginThread1"),
-        new Thread(() -> {
-          long time = System.currentTimeMillis();
-          long userTime = tmbean.getCurrentThreadUserTime();
-          long cpuTime = tmbean.getCurrentThreadCpuTime();
-          long count = 0;
-          double totalDistance = 0;
-          while (testing.get()) {
-            totalDistance += position.distanceFromOrigin();
-            count++;
-          }
-          bestDistanceThread.accumulate(count);
-          worstDistanceThread.accumulate(count);
-          time = System.currentTimeMillis() - time;
-          userTime = tmbean.getCurrentThreadUserTime() - userTime;
-          cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
-          System.out.printf(Locale.US, "distanceFromOrigin2() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
-              count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
-        }, "distanceFromOriginThread2"),
-    };
-    for (Thread thread : threads) {
-      thread.start();
+    for (int reader = 1; reader <= READERS; reader++) {
+      int finalReader = reader;
+      threads.submit(() -> {
+        long time = System.currentTimeMillis();
+        long userTime = tmbean.getCurrentThreadUserTime();
+        long cpuTime = tmbean.getCurrentThreadCpuTime();
+        long count = 0;
+        double totalDistance = 0;
+        while (testing.get()) {
+          totalDistance += position.distanceFromOrigin();
+          count++;
+        }
+        bestDistanceThread.accumulate(count);
+        worstDistanceThread.accumulate(count);
+        time = System.currentTimeMillis() - time;
+        userTime = tmbean.getCurrentThreadUserTime() - userTime;
+        cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
+        System.out.printf(Locale.US, "distanceFromOrigin" + finalReader + "() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
+                count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
+      });
     }
 
     Thread.sleep(3000);
     testing.set(false);
-    for (Thread thread : threads) {
-      thread.interrupt();
-      thread.join();
+
+    threads.shutdown();
+    while(!threads.awaitTermination(1, TimeUnit.SECONDS)) {
+      System.out.println("Waiting for pool to shut down ...");
     }
   }
 }
