@@ -19,7 +19,7 @@ public class PositionTest {
 
   public static final int REPEATS = 10;
   private static final int WRITERS = Math.max(Runtime.getRuntime().availableProcessors() / 6, 1);
-  private static final int READERS = Math.max((Runtime.getRuntime().availableProcessors() - WRITERS * 2)/ 2, 1);
+  private static final int READERS = Math.max(Runtime.getRuntime().availableProcessors() / 2 - WRITERS, 1);
   static {
     System.out.println("REPEATS = " + REPEATS);
     System.out.println("WRITERS = " + WRITERS);
