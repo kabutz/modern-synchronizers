@@ -81,9 +81,27 @@ public class PositionTest {
           time = System.currentTimeMillis() - time;
           userTime = tmbean.getCurrentThreadUserTime() - userTime;
           cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
-          System.out.printf(Locale.US, "distanceFromOrigin() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
+          System.out.printf(Locale.US, "distanceFromOrigin1() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
               count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
-        }, "distanceFromOriginThread"),
+        }, "distanceFromOriginThread1"),
+        new Thread(() -> {
+          long time = System.currentTimeMillis();
+          long userTime = tmbean.getCurrentThreadUserTime();
+          long cpuTime = tmbean.getCurrentThreadCpuTime();
+          long count = 0;
+          double totalDistance = 0;
+          while (testing.get()) {
+            totalDistance += position.distanceFromOrigin();
+            count++;
+          }
+          bestDistanceThread.accumulate(count);
+          worstDistanceThread.accumulate(count);
+          time = System.currentTimeMillis() - time;
+          userTime = tmbean.getCurrentThreadUserTime() - userTime;
+          cpuTime = tmbean.getCurrentThreadCpuTime() - cpuTime;
+          System.out.printf(Locale.US, "distanceFromOrigin2() called %,d times, c/e=%d%%, u/e=%d%%, s/e=%d%%%n",
+              count, (cpuTime / time) / 10_000, userTime / time / 10_000, (cpuTime - userTime) / time / 10_000);
+        }, "distanceFromOriginThread2"),
     };
     for (Thread thread : threads) {
       thread.start();
