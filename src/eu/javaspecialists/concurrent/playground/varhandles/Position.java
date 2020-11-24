@@ -23,7 +23,7 @@ public class Position {
     do {
       current = xy;
       next[0] = current[0] + deltaX;
-      next[1] = current[1] + deltaX;
+      next[1] = current[1] + deltaY;
     } while(!XY.compareAndSet(this, current, next));
   }
 
