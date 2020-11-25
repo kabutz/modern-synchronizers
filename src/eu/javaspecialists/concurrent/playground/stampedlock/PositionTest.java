@@ -52,11 +52,11 @@ public class PositionTest {
     Position position = new Position(0, 0);
     AtomicBoolean testing = new AtomicBoolean(true);
 
-    ExecutorService threads = Executors.newCachedThreadPool();
+    ExecutorService pool = Executors.newCachedThreadPool();
 
     for (int writer = 1; writer <= WRITERS; writer++) {
       int finalWriter = writer;
-      threads.submit(() -> {
+      pool.submit(() -> {
         double[] moves = ThreadLocalRandom.current().doubles(1024, -100, +100).toArray();
         long time = System.currentTimeMillis();
         long userTime = tmbean.getCurrentThreadUserTime();
@@ -79,7 +79,7 @@ public class PositionTest {
 
     for (int reader = 1; reader <= READERS; reader++) {
       int finalReader = reader;
-      threads.submit(() -> {
+      pool.submit(() -> {
         long time = System.currentTimeMillis();
         long userTime = tmbean.getCurrentThreadUserTime();
         long cpuTime = tmbean.getCurrentThreadCpuTime();
@@ -102,10 +102,11 @@ public class PositionTest {
     Thread.sleep(3000);
     testing.set(false);
 
-    threads.shutdown();
-    while(!threads.awaitTermination(1, TimeUnit.SECONDS)) {
+    pool.shutdown();
+    while(!pool.awaitTermination(1, TimeUnit.SECONDS)) {
       System.out.println("Waiting for pool to shut down ...");
     }
+    System.out.println();
   }
 }
 
