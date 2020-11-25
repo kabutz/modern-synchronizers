@@ -20,6 +20,7 @@ public class PositionTest {
     public static final int REPEATS = 10;
     private static final int WRITERS = Math.max(Runtime.getRuntime().availableProcessors() / 6, 1);
     private static final int READERS = Math.max(Runtime.getRuntime().availableProcessors() / 2 - WRITERS, 1);
+
     static {
         System.out.println("REPEATS = " + REPEATS);
         System.out.println("WRITERS = " + WRITERS);
@@ -103,7 +104,7 @@ public class PositionTest {
         testing.set(false);
 
         pool.shutdown();
-        while(!pool.awaitTermination(1, TimeUnit.SECONDS)) {
+        while (!pool.awaitTermination(1, TimeUnit.SECONDS)) {
             System.out.println("Waiting for pool to shut down ...");
         }
         System.out.println();

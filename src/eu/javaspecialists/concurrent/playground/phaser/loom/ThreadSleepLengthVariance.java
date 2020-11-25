@@ -61,8 +61,8 @@ public class ThreadSleepLengthVariance {
         System.out.println("Waiting for us all to wake up ...");
 
         pool.shutdown();
-        while(!pool.awaitTermination(1, TimeUnit.SECONDS)) {
-          System.out.println("Waiting for pool ...");
+        while (!pool.awaitTermination(1, TimeUnit.SECONDS)) {
+            System.out.println("Waiting for pool ...");
         }
         if (times.size() != NUMBER_OF_THREADS) throw new AssertionError();
         System.out.println(times.stream().mapToLong(Long::longValue).summaryStatistics());

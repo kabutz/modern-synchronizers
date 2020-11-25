@@ -15,25 +15,25 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class TestAll {
-  public static void main(String... args) {
-    try {
-      for (int i = 0; i < 10; i++) {
-        test();
-        System.out.println();
-      }
-    } finally {
-      CojoinedTasksTester.shutdown();
+    public static void main(String... args) {
+        try {
+            for (int i = 0; i < 10; i++) {
+                test();
+                System.out.println();
+            }
+        } finally {
+            CojoinedTasksTester.shutdown();
+        }
     }
-  }
 
-  private static void test() {
-    Stream.<Supplier<Cojoiner>>of(
-        NoneCojoiner::new,
-        WaitNotifyCojoiner::new,
-        CountDownLatchCojoiner::new,
-        VolatileSpinCojoiner::new,
-        PhaserCojoiner::new
-    )
-        .forEach(CojoinedTasksTester::test);
-  }
+    private static void test() {
+        Stream.<Supplier<Cojoiner>>of(
+                NoneCojoiner::new,
+                WaitNotifyCojoiner::new,
+                CountDownLatchCojoiner::new,
+                VolatileSpinCojoiner::new,
+                PhaserCojoiner::new
+        )
+                .forEach(CojoinedTasksTester::test);
+    }
 }
