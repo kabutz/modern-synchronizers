@@ -16,11 +16,14 @@ import java.util.stream.*;
 
 public class TestAll {
   public static void main(String... args) {
-    for (int i = 0; i < 10; i++) {
-      test();
-      System.out.println();
+    try {
+      for (int i = 0; i < 10; i++) {
+        test();
+        System.out.println();
+      }
+    } finally {
+      CojoinedTasksTester.shutdown();
     }
-    CojoinedTasksTester.shutdown();
   }
 
   private static void test() {
