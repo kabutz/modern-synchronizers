@@ -11,6 +11,7 @@ package eu.javaspecialists.concurrent.playground.stampedlock;
 
 import java.util.*;
 
+// https://www.javaspecialists.eu/archive/Issue242-Concurrency-Puzzle-Explained-Solved-With-StampedLock.html
 public class IntList {
     private final Object monitor = new Object();
     private int[] arr = new int[10];
