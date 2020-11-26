@@ -11,6 +11,16 @@ package eu.javaspecialists.concurrent.playground.varhandles;
 
 import java.lang.invoke.*;
 
+/*
+
+Best values:
+        moveBy()        9,299,325
+        distanceFromOrigin()         120,999,015
+Worst values:
+        moveBy()        4,994,981
+        distanceFromOrigin()         29,764,736
+
+ */
 public class Position {
     private volatile double[] xy;
 
@@ -22,8 +32,8 @@ public class Position {
         double[] current, next = new double[2];
         do {
             current = xy;
-            current[0] = next[0] + deltaX;
-            current[1] = next[1] + deltaY;
+            next[0] = current[0] + deltaX;
+            next[1] = current[1] + deltaY;
         } while (!XY.compareAndSet(this, current, next));
     }
 
