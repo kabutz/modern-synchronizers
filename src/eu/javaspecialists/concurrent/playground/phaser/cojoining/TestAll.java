@@ -32,8 +32,8 @@ public class TestAll {
                 WaitNotifyCojoiner::new,
                 ConditionAwaitSignalCojoiner::new,
                 CountDownLatchCojoiner::new,
-                VolatileSpinCojoiner::new//,
-//                PhaserCojoiner::new
+                VolatileSpinCojoiner::new,
+                PhaserCojoiner::new
         )
                 .forEach(CojoinedTasksTester::test);
     }
