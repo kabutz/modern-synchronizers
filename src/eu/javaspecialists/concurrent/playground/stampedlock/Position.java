@@ -27,13 +27,23 @@ Worst values:
         moveBy()        16,777,996
         distanceFromOrigin()         14,501,826
 
+fair ReentrantLock:
+Best values:
+        moveBy()        160,823
+        distanceFromOrigin()         163,312
+Worst values:
+        moveBy()        126,777
+        distanceFromOrigin()         126,797
+
+
+
  */
 
 import java.util.concurrent.locks.*;
 
 // TODO: Refactor to use ReentrantLock, then ReentrantReadWriteLock, then StampedLock
 public class Position {
-    private final Lock lock = new ReentrantLock(true);
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private double x, y;
 
     public Position(double x, double y) {
@@ -42,21 +52,21 @@ public class Position {
     }
 
     public void moveBy(double deltaX, double deltaY) {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             x += deltaX;
             y += deltaY;
         } finally {
-            lock.unlock();
+            lock.writeLock().unlock();
         }
     }
 
     public double distanceFromOrigin() {
-        lock.lock();
+        lock.readLock().lock();
         try {
             return Math.sqrt(x * x + y * y);
         } finally {
-            lock.unlock();
+            lock.readLock().unlock();
         }
     }
 }
