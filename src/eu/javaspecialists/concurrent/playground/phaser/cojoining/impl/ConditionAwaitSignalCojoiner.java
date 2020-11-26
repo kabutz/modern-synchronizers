@@ -11,12 +11,29 @@ package eu.javaspecialists.concurrent.playground.phaser.cojoining.impl;
 
 import eu.javaspecialists.concurrent.playground.phaser.cojoining.*;
 
+import java.util.concurrent.locks.*;
+
 public class ConditionAwaitSignalCojoiner implements Cojoiner {
+    private final Lock lock = new ReentrantLock();
+    private final Condition readyCondition = lock.newCondition();
+    private boolean ready = false;
+
     public void runWaiter() {
-        throw new UnsupportedOperationException("TODO");
+        lock.lock();
+        try {
+            while (!ready) readyCondition.awaitUninterruptibly();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void runSignaller() {
-        throw new UnsupportedOperationException("TODO");
+        lock.lock();
+        try {
+            ready = true;
+            readyCondition.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 }
