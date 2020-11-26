@@ -10,6 +10,17 @@
 package eu.javaspecialists.concurrent.playground.stampedlock;
 
 
+/*
+synchronized:
+Best values:
+        moveBy()        6,783,490
+        distanceFromOrigin()         4,925,671
+Worst values:
+        moveBy()        4,115,273
+        distanceFromOrigin()         3,740,724
+
+ */
+
 // TODO: Refactor to use ReentrantLock, then ReentrantReadWriteLock, then StampedLock
 public class Position {
     private double x, y;
@@ -19,12 +30,12 @@ public class Position {
         this.y = y;
     }
 
-    public synchronized void moveBy(double deltaX, double deltaY) {
+    public void moveBy(double deltaX, double deltaY) {
         x += deltaX;
         y += deltaY;
     }
 
-    public synchronized double distanceFromOrigin() {
+    public double distanceFromOrigin() {
         return Math.sqrt(x * x + y * y);
     }
 }
