@@ -45,6 +45,14 @@ Worst values:
         distanceFromOrigin()         2,762,214
 
 
+StampedLock Java 8 idiom:
+Best values:
+        moveBy()        33,242,428
+        distanceFromOrigin()         156,611,227
+Worst values:
+        moveBy()        16,789,723
+        distanceFromOrigin()         81,814,448
+
 
  */
 
