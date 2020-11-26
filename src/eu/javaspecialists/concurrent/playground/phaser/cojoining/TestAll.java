@@ -29,11 +29,11 @@ public class TestAll {
     private static void test() {
         Stream.<Supplier<Cojoiner>>of(
                 NoneCojoiner::new,
-                WaitNotifyCojoiner::new,
-                ConditionAwaitSignalCojoiner::new,
-                CountDownLatchCojoiner::new,
-                VolatileSpinCojoiner::new,
-                PhaserCojoiner::new
+                WaitNotifyCojoiner::new//,
+//                ConditionAwaitSignalCojoiner::new,
+//                CountDownLatchCojoiner::new,
+//                VolatileSpinCojoiner::new,
+//                PhaserCojoiner::new
         )
                 .forEach(CojoinedTasksTester::test);
     }
