@@ -12,11 +12,12 @@ package eu.javaspecialists.concurrent.playground.phaser.cojoining.impl;
 import eu.javaspecialists.concurrent.playground.phaser.cojoining.*;
 
 public class VolatileSpinCojoiner implements Cojoiner {
+    private volatile boolean ready = false;
     public void runWaiter() {
-        throw new UnsupportedOperationException("TODO");
+        while(!ready) Thread.onSpinWait();
     }
 
     public void runSignaller() {
-        throw new UnsupportedOperationException("TODO");
+        ready = true;
     }
 }
