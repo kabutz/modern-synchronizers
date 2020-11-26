@@ -21,8 +21,11 @@ Worst values:
 
  */
 
+import java.util.concurrent.locks.*;
+
 // TODO: Refactor to use ReentrantLock, then ReentrantReadWriteLock, then StampedLock
 public class Position {
+    private final Lock lock = new ReentrantLock();
     private double x, y;
 
     public Position(double x, double y) {
@@ -31,12 +34,22 @@ public class Position {
     }
 
     public void moveBy(double deltaX, double deltaY) {
-        x += deltaX;
-        y += deltaY;
+        lock.lock();
+        try {
+            x += deltaX;
+            y += deltaY;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public double distanceFromOrigin() {
-        return Math.sqrt(x * x + y * y);
+        lock.lock();
+        try {
+            return Math.sqrt(x * x + y * y);
+        } finally {
+            lock.unlock();
+        }
     }
 }
 
