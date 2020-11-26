@@ -30,8 +30,8 @@ public class TestAll {
         Stream.<Supplier<Cojoiner>>of(
                 NoneCojoiner::new,
                 WaitNotifyCojoiner::new,
-                ConditionAwaitSignalCojoiner::new//,
-//                CountDownLatchCojoiner::new,
+                ConditionAwaitSignalCojoiner::new,
+                CountDownLatchCojoiner::new//,
 //                VolatileSpinCojoiner::new,
 //                PhaserCojoiner::new
         )
